@@ -13,7 +13,7 @@ const props = defineProps({
 });
 
 const isCurrentUser = computed(() => {
-    return props.currentUser.name === props.message.user.name;
+    return props.currentUser.id === props.message.user.id;
 });
 </script>
 

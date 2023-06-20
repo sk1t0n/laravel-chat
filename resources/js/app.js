@@ -6,9 +6,9 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 import { i18nVue } from 'laravel-vue-i18n';
+import { createPinia } from 'pinia';
 
-const appName =
-    window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
+const pinia = createPinia();
 
 createInertiaApp({
     title: (title) => `${title}`,
@@ -27,6 +27,7 @@ createInertiaApp({
                     return await langs[`../../lang/${lang}.json`]();
                 },
             })
+            .use(pinia)
             .mount(el);
     },
     progress: {

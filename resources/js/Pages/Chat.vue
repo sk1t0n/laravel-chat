@@ -1,9 +1,14 @@
 <script setup>
+import { onMounted, ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import ChatMessage from '@/Components/Chat/ChatMessage.vue';
 import ChatForm from '@/Components/Chat/ChatForm.vue';
+import { useChatStore } from '@/Store/chat';
+import { scrollMessages } from '@/Helpers/messages';
 
-defineProps({
+const store = useChatStore();
+
+const props = defineProps({
     currentUser: {
         type: Object,
         required: true
@@ -13,6 +18,20 @@ defineProps({
         required: true
     }
 });
+
+onMounted(() => {
+    store.messages = props.messages;
+    scrollMessages();
+});
+
+Echo.private('chat')
+    .listen('MessageSent', (e) => {
+        store.addMessage({
+            message: e.message.message,
+            user: e.user
+        });
+        scrollMessages();
+    });
 </script>
 
 <template>
@@ -31,7 +50,7 @@ defineProps({
             </div>
             <div id="messages"
                 class="flex flex-1 flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
-                <template v-for="(message, index) in messages" :key="index">
+                <template v-for="(message, index) in store.messages" :key="index">
                     <ChatMessage :currentUser="currentUser" :message="message" />
                 </template>
             </div>
