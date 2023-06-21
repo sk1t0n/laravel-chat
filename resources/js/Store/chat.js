@@ -4,6 +4,7 @@ import { ref } from 'vue';
 export const useChatStore = defineStore('chat', () => {
     const messages = ref([]);
     const errors = ref([]);
+    const isLoading = ref(false);
 
     function addMessage(message) {
         messages.value.push(message);
@@ -16,6 +17,7 @@ export const useChatStore = defineStore('chat', () => {
     return {
         messages,
         errors,
+        isLoading,
         addMessage,
         addError,
     };

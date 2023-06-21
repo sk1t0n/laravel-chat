@@ -3,6 +3,7 @@ import { reactive } from 'vue';
 import axios from 'axios';
 import { useChatStore } from '@/Store/chat';
 import { scrollMessages } from '@/Helpers/messages';
+import ChatLoader from '@/Components/Chat/ChatLoader.vue';
 
 const form = reactive({
     message: ''
@@ -13,6 +14,7 @@ const store = useChatStore();
 async function addMessage() {
     try {
         store.errors = [];
+        store.isLoading = true;
 
         const response = await axios.post(route('chat.addMessage'), form);
         store.addMessage(response.data);
@@ -22,11 +24,15 @@ async function addMessage() {
         store.addError(e.response.data.message);
     } finally {
         form.message = '';
+        store.isLoading = false;
     }
 }
 </script>
 
 <template>
+    <div v-if="store.isLoading">
+        <ChatLoader size="50" />
+    </div>
     <div v-if="store.errors" class="text-red-500 py-4">
         <template v-for="(message, key) in store.errors" :key="key">
             <span>{{ message }}</span>
@@ -35,10 +41,11 @@ async function addMessage() {
     <div class="relative flex">
         <input v-model="form.message" type="text" :placeholder="$t('Write your message')"
             class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-4 bg-gray-200 rounded-md py-3"
-            @keyup.enter="addMessage">
+            @keyup.enter="addMessage" :disabled="store.isLoading">
         <div class="absolute right-0 items-center inset-y-0 hidden sm:flex">
             <button type="button" @click="addMessage"
-                class="inline-flex items-center justify-center rounded-lg px-4 py-3 transition duration-500 ease-in-out text-white bg-blue-500 hover:bg-blue-400 focus:outline-none">
+                class="inline-flex items-center justify-center rounded-lg px-4 py-3 transition duration-500 ease-in-out text-white bg-blue-500 hover:bg-blue-400 focus:outline-none"
+                :disabled="store.isLoading">
                 <span class="font-bold">{{ $t('Send') }}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                     class="h-6 w-6 ml-2 transform rotate-90">
